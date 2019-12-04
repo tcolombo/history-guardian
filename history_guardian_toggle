@@ -1,0 +1,24 @@
+#!/bin/bash
+
+
+# Toggle to per directory history mode
+# ${1} : Absolute path of the local history file
+historyFileToggleToPerDir() {
+    unset HISTFILE_GLOBAL
+    export HISTFILE_GLOBAL=${HISTFILE}
+    unset HISTFILE
+    export HISTFILE=${1}
+    history -R ${HISTFILE}
+    unset HISTMODE
+    export HISTMODE='dir'
+}
+
+
+# Toggle to global history mode
+historyFileToggleToGlobal() {
+    unset HISTFILE
+    export HISTFILE=${HISTFILE_GLOBAL}
+    history -R ${HISTFILE}
+    unset HISTMODE
+    export HISTMODE='global'
+}

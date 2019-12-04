@@ -1,0 +1,48 @@
+#!/bin/bash
+
+
+usage() {
+    echo "Usage: history_guardian <start|stop>"
+    echo "       start: Activate per directory history mode for the current directory"
+    echo "       stop: Deactivate per directory history mode for the current directory and"
+    echo "             delete local history file .history"
+}
+
+
+historyToggle() {
+    if [[ ! -f '.history' ]]; then
+        touch .history
+    fi
+
+    historyFileToggleToPerDir ${PWD}/.history
+
+    echo 'Per directory history activated !' 1>&2
+}
+
+
+historyClean() {
+    rm .history
+    historyFileToggleToGlobal
+
+    echo 'Local history file deleted' 1>&2
+    echo 'Global history activated !' 1>&2
+}
+
+
+# Programme principal
+if [[ "${#}" -ne 1 ]]; then
+    usage
+else
+    # Chargement des fonctions
+    source ${HOME}/bin/history_guardian_toggle
+
+    if [ "${1}" = start ]; then
+        # Activation du mode historique par répertoire
+        historyToggle
+    elif [ "${1}" = stop ]; then
+        # Nettoyage de l'historique local
+        historyClean
+    else
+        usage
+    fi
+fi

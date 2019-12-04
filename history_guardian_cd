@@ -1,0 +1,52 @@
+#!/bin/bash
+
+
+# Passage en mode "historique global"
+switch_to_global() {
+    if [ "${HISTMODE}" = dir ]; then
+        echo 'Global history activated !' 1>&2
+        historyFileToggleToGlobal
+    fi
+}
+
+
+# Passage en mode "historique par répertoire"
+# ${1} : Absolute path of the local history file
+switch_to_dir() {
+    if [ "${HISTMODE}" = global ]; then
+        echo 'Per directory history activated !' 1>&2
+        historyFileToggleToPerDir ${1}
+    fi
+}
+
+
+# Traitement principal
+# ${@} : liste des paramètres
+main() {
+    if [[ "${#}" == 0 ]]; then
+        directory=${HOME}/.history
+    fi
+
+    if [[ "${#}" == 1 ]]; then
+        if [[ "${1}" == ".." ]]; then
+            directory=$(dirname ${PWD})/.history
+        else
+            directory=${PWD}/${1}/.history
+        fi
+    fi
+
+    # Teste si le répertoire cible est présent dans l'historique
+    if [ -f "${directory}" ]; then
+        switch_to_dir "${directory}"
+    else
+        switch_to_global
+    fi
+}
+
+
+# Programme principal
+# Chargement des fonctions
+source ${HOME}/bin/history_guardian_toggle
+
+main "${@}"
+\cd "${@}"
